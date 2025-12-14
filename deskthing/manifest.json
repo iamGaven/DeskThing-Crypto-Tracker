@@ -1,0 +1,20 @@
+{
+  "label": "Crypto Tracker",
+  "tags": [],
+  "requires": [
+    "crypto-tracker"
+  ],
+  "version": "0.11.4",
+  "requiredVersions": {
+    "server": " 0.11.4",
+    "client": " 0.11.4"
+  },
+  "description": "Real-time cryptocurrency price tracker",
+  "author": "IamGaven",
+  "platforms": [],
+  "repository": "",
+  "homepage": "",
+  "updateUrl": "",
+  "id": "crypto-tracker",
+  "template": "full"
+}
