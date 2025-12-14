@@ -1,6 +1,6 @@
 {
   "label": "Crypto Tracker",
-  "tags": [],
+  "tags": ["Crypto,Tracker,Crypto Tracker,bitcoin,btc,eth"],
   "requires": [
     "crypto-tracker"
   ],
@@ -12,9 +12,9 @@
   "description": "Real-time cryptocurrency price tracker",
   "author": "IamGaven",
   "platforms": [],
-  "repository": "",
-  "homepage": "",
-  "updateUrl": "",
+  "repository": "https://github.com/iamGaven/DeskThing-Crypto-Tracker.git",
+  "homepage": "https://github.com/iamGaven/DeskThing-Crypto-Tracker.git",
+  "updateUrl": "https://github.com/iamGaven/DeskThing-Crypto-Tracker.git",
   "id": "crypto-tracker",
   "template": "full"
 }
