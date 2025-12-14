@@ -1,8 +1,9 @@
 {
   "label": "Crypto Tracker",
+  "icon": "cryptotracker.svg",
   "tags": ["webappOnly"],
   "requires": [
-    "crypto-tracker"
+    "cryptotracker"
   ],
   "version": "0.11.4",
   "requiredVersions": {
@@ -11,10 +12,10 @@
   },
   "description": "Real-time cryptocurrency price tracker",
   "author": "IamGaven",
-  "platforms": ["windows"],
+  "platforms":["windows","macos","linux"],
   "repository": "https://github.com/iamGaven/DeskThing-Crypto-Tracker.git",
   "homepage": "https://github.com/iamGaven/DeskThing-Crypto-Tracker.git",
   "updateUrl": "https://github.com/iamGaven/DeskThing-Crypto-Tracker.git",
-  "id": "crypto-tracker",
+  "id": "cryptotracker",
   "template": "full"
 }
