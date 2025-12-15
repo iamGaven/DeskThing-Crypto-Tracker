@@ -7,8 +7,8 @@
   ],
   "version": "0.11.4",
   "requiredVersions": {
-    "server": " 0.11.4",
-    "client": " 0.11.4"
+    "server": " 0.11.17",
+    "client": " 0.11.2"
   },
   "description": "Real-time cryptocurrency price tracker",
   "author": "IamGaven",
