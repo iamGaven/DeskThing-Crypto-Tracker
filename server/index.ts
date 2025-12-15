@@ -20,6 +20,26 @@ const RETRY_CONFIG = {
 let retryCount = 0;
 let retryTimeout: NodeJS.Timeout | null = null;
 
+// Merge and deduplicate coins from preset selection and custom input
+const getMergedCoins = (presetCoins: any, customCoinsString: any): string[] => {
+  // Ensure presetCoins is an array
+  const preset = Array.isArray(presetCoins) ? presetCoins : [];
+  
+  // Ensure customCoinsString is a string and parse it
+  const customString = typeof customCoinsString === 'string' ? customCoinsString : '';
+  const customCoins = customString
+    .split(',')
+    .map(coin => coin.trim().toLowerCase())
+    .filter(coin => coin.length > 0);
+  
+  // Combine and remove duplicates (case-insensitive)
+  const allCoins = [...preset, ...customCoins];
+  const uniqueCoins = Array.from(new Set(allCoins.map(c => c.toLowerCase())));
+  
+  console.log("Merged coins:", uniqueCoins);
+  return uniqueCoins;
+};
+
 // Calculate delay with exponential backoff
 const getRetryDelay = (attempt: number): number => {
   const delay = Math.min(
@@ -106,12 +126,26 @@ DeskThing.on(DESKTHING_EVENTS.SETTINGS, async (settings) => {
     console.log("Settings:", settings);
     const payload = settings.payload as any;
     
-    cryptoService.updateSettings(settings.payload);
+    // Extract actual values from settings structure
+    const presetCoins = payload?.coins?.value || payload?.coins || [];
+    const customCoins = payload?.custom_coins?.value || payload?.custom_coins || "";
+    
+    console.log("Preset coins extracted:", presetCoins);
+    console.log("Custom coins extracted:", customCoins);
+    
+    const mergedCoins = getMergedCoins(presetCoins, customCoins);
+    
+    // Create a modified settings object with merged coins
+    const modifiedSettings = {
+      ...settings.payload,
+      coins: mergedCoins
+    };
+    
+    cryptoService.updateSettings(modifiedSettings);
     
     // After settings update, try to fetch prices if coins are configured
-    const coins = payload?.coins;
-    if (coins && Array.isArray(coins) && coins.length > 0) {
-      console.log("Coins configured, attempting to fetch prices...");
+    if (mergedCoins.length > 0) {
+      console.log(`Coins configured (${mergedCoins.length} total), attempting to fetch prices...`);
       setTimeout(() => {
         retryGetPrices(0);
       }, 1000);
@@ -174,6 +208,13 @@ const setupSettings = async () => {
         { label: "Aptos (APT)", value: "aptos" },
       ],
     },
+    custom_coins: {
+      label: "Custom Coins",
+      id: "custom_coins",
+      value: "",
+      description: "Add custom coin IDs (comma-separated, e.g., pepe,bonk,floki). These will be added to your selection above.",
+      type: SETTING_TYPES.STRING,
+    },
     currency: {
       label: "Currency",
       id: "currency",
@@ -219,7 +260,21 @@ const start = async () => {
   const initialSettings = await DeskThing.getData();
   console.log("Loading initial settings:", initialSettings);
   if (initialSettings) {
-    cryptoService.updateSettings(initialSettings);
+    const payload = initialSettings as any;
+    const presetCoins = payload?.coins?.value || payload?.coins || [];
+    const customCoins = payload?.custom_coins?.value || payload?.custom_coins || "";
+    
+    console.log("Initial preset coins:", presetCoins);
+    console.log("Initial custom coins:", customCoins);
+    
+    const mergedCoins = getMergedCoins(presetCoins, customCoins);
+    
+    const modifiedSettings = {
+      ...initialSettings,
+      coins: mergedCoins
+    };
+    
+    cryptoService.updateSettings(modifiedSettings);
   }
   
   cryptoService.start();
@@ -229,9 +284,16 @@ const start = async () => {
   setTimeout(async () => {
     console.log("Initial price fetch attempt...");
     const settings = await DeskThing.getData();
-    const coins = (settings as any)?.coins;
+    const payload = settings as any;
+    const presetCoins = payload?.coins?.value || payload?.coins || [];
+    const customCoins = payload?.custom_coins?.value || payload?.custom_coins || "";
     
-    if (coins && Array.isArray(coins) && coins.length > 0) {
+    console.log("Timeout preset coins:", presetCoins);
+    console.log("Timeout custom coins:", customCoins);
+    
+    const mergedCoins = getMergedCoins(presetCoins, customCoins);
+    
+    if (mergedCoins.length > 0) {
       console.log("Coins configured, starting initial fetch with retry...");
       await retryGetPrices(0);
     } else {
